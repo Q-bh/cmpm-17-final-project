@@ -1,4 +1,4 @@
-# cmpm17-final-project
+# cmpm-17-final-project
 Created in Winter 2025 by Liam Youm & Kevin Nguyen.
 
 ## Brief
