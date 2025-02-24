@@ -1,3 +1,5 @@
+# Excess libraries are included in case they are needed
+# They will be removed by the final project's completion if they remain unused
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,10 +11,12 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.datasets as datasets
 from torchvision.transforms import v2
 
+# IMAGE TRANSFORMATIONS
 transform = v2.Compose([
-    v2.ToTensor()
+    v2.ToTensor(),
 ])
 
+# DATASETS + DATALOADERS
 train_dataset = datasets.ImageFolder(root="dataset/train", transform=transform)
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True,)
 
