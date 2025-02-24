@@ -14,6 +14,7 @@ from torchvision.transforms import v2
 # IMAGE TRANSFORMATIONS
 transform = v2.Compose([
     v2.ToTensor(),
+    v2.Grayscale(1),
 ])
 
 # DATASETS + DATALOADERS
