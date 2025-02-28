@@ -13,7 +13,7 @@ from torchvision.transforms import v2
 
 # Dataset
 class CNN_Dataset(Dataset):
-    def __init__(self, data):
+    def __init__(self, data, transform):
         self.data = datasets.ImageFolder(root=data, transform=transform)
         self.length = len(self.data)
 
@@ -42,10 +42,10 @@ test_transforms = v2.Compose([
 ])
 
 # DATASETS + DATALOADERS
-train_dataset = CNN_Dataset("dataset/train")
+train_dataset = CNN_Dataset("dataset/train", train_transforms)
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True,)
 
-test_dataset = CNN_Dataset("dataset/test")
+test_dataset = CNN_Dataset("dataset/test", test_transforms)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
 # INITIALIZATIONS
