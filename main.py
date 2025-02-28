@@ -11,6 +11,18 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.datasets as datasets
 from torchvision.transforms import v2
 
+# Dataset
+class CNN_Dataset(Dataset):
+    def __init__(self, data):
+        self.data = datasets.ImageFolder(root=data, transform=transform)
+        self.length = len(self.data)
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, index):
+        return self.data[index]
+    
 # IMAGE TRANSFORMATIONS
 transform = v2.Compose([
     v2.ToTensor(),
@@ -18,10 +30,10 @@ transform = v2.Compose([
 ])
 
 # DATASETS + DATALOADERS
-train_dataset = datasets.ImageFolder(root="dataset/train", transform=transform)
+train_dataset = CNN_Dataset("dataset/train")
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True,)
 
-test_dataset = datasets.ImageFolder(root="dataset/test", transform=transform)
+test_dataset = CNN_Dataset("dataset/test")
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
 for x, y in train_dataloader:
