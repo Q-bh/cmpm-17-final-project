@@ -54,3 +54,5 @@ for image in images_to_delete_test:
     if os.path.isfile(image_path):
         os.remove(image_path)
 
+
+# DONE!
