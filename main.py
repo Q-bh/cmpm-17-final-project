@@ -24,9 +24,21 @@ class CNN_Dataset(Dataset):
         return self.data[index]
     
 # IMAGE TRANSFORMATIONS
-transform = v2.Compose([
+train_transforms = v2.Compose([
+    v2.RandomResizedCrop(224),
+    v2.RandomHorizontalFlip(),
+    v2.RandomRotation(30),
     v2.ToTensor(),
-    v2.Grayscale(1), # Images are grayscale already, but this properly makes the tensors 1 channel
+    v2.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    v2.Grayscale(1) # Images are grayscale already, but this properly makes the tensors 1 channel
+])
+
+test_transforms = v2.Compose([
+    v2.Resize(256),
+    v2.CenterCrop(224),
+    v2.ToTensor(),
+    v2.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    v2.Grayscale(1),
 ])
 
 # DATASETS + DATALOADERS
