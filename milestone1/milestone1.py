@@ -12,12 +12,12 @@ def display_images(images, labels):
 
     for class_idx, class_label in enumerate(class_labels):
         class_images = [img for img, lbl in zip(images, labels) if lbl == class_label]
-        # 최대 10장까지만 사용
+        # Using 10 maximum
         class_images = class_images[:images_per_class]
 
         for i, img in enumerate(class_images):
             plt.subplot(len(class_labels), images_per_class, class_idx * images_per_class + i + 1)
-            # PIL Image를 직접 imshow에 넘긴다
+            # Passing the PIL image to imshow directly
             plt.imshow(img, cmap='gray', vmin=0, vmax=255)
             plt.title(class_label)
             plt.axis('off')
@@ -25,7 +25,7 @@ def display_images(images, labels):
     plt.tight_layout()
     plt.show()
 
-# === 메인 코드 ===
+# === Main code ===
 dataset_path = '../dataset/train'
 class_paths = glob.glob(os.path.join(dataset_path, '*'))
 
@@ -44,5 +44,5 @@ for class_path in class_paths:
             images.append(img.copy())
         labels.append(class_label)
 
-# 리스트로 유지 (굳이 np.array로 변환할 필요 없음)
+# Keep it as a list, no need to convert it to NumPy array
 display_images(images, labels)

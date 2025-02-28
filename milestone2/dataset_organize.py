@@ -53,3 +53,4 @@ for image in images_to_delete_test:
     image_path = os.path.join(happy_folder_test, image)
     if os.path.isfile(image_path):
         os.remove(image_path)
+
