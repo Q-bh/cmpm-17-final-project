@@ -13,7 +13,7 @@ from torchvision.transforms import v2
 
 # Dataset
 class CNN_Dataset(Dataset):
-    def __init__(self, data):
+    def __init__(self, data, transform=None):
         self.data = datasets.ImageFolder(root=data, transform=transform)
         self.length = len(self.data)
 
@@ -22,8 +22,10 @@ class CNN_Dataset(Dataset):
 
     def __getitem__(self, index):
         return self.data[index]
+        
     
 # IMAGE TRANSFORMATIONS
+# Making images change diversely so that the model can become more robust
 train_transforms = v2.Compose([
     v2.RandomResizedCrop(224),
     v2.RandomHorizontalFlip(),
@@ -32,7 +34,7 @@ train_transforms = v2.Compose([
     v2.ToTensor(),
     v2.Normalize([0.5], [0.5])
 ])
-
+# Only transforms for matching the size of images.
 test_transforms = v2.Compose([
     v2.Resize(256),
     v2.CenterCrop(224),
@@ -42,10 +44,10 @@ test_transforms = v2.Compose([
 ])
 
 # DATASETS + DATALOADERS
-train_dataset = CNN_Dataset("dataset/train")
+train_dataset = CNN_Dataset("dataset/train", transform = train_transforms)
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True,)
 
-test_dataset = CNN_Dataset("dataset/test")
+test_dataset = CNN_Dataset("dataset/test", transform = test_transforms)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
 # INITIALIZATIONS
