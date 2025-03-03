@@ -13,7 +13,7 @@ from torchvision.transforms import v2
 
 # Dataset
 class CNN_Dataset(Dataset):
-    def __init__(self, data, transform=None):
+    def __init__(self, data, transform):
         self.data = datasets.ImageFolder(root=data, transform=transform)
         self.length = len(self.data)
 
@@ -24,17 +24,17 @@ class CNN_Dataset(Dataset):
         return self.data[index]
         
     
-# IMAGE TRANSFORMATIONS
-# Making images change diversely so that the model can become more robust
+# IMAGE TRANSFORMATIONS - Increases model robustness
 train_transforms = v2.Compose([
-    v2.Resize((128, 128)), # Resizing the images to 128x128, Original data is 48x48
-    v2.RandomHorizontalFlip(), # Flipping images horizontally with 0.5 prob
-    v2.RandomRotation(30), # Rotation on images up to 30 degree
-    v2.Grayscale(1), # Images are grayscale already, but this properly makes the tensors 1 channel
-    #v2.Lambda(add_noise), # Adding noise, depending on the model performance
+    v2.Resize((128, 128)),     # Resizes image to 128x128; Original data is 48x48
+    v2.RandomHorizontalFlip(), # Flips images horizontally with 50% probability
+    v2.RandomRotation(30),     # Rotation on images up to 30 degrees
+    v2.Grayscale(1),           # Images are grayscale already, but this properly makes the tensors 1 channel
+    #v2.Lambda(add_noise),     # Adding noise, depending on the model performance
     v2.ToTensor(),
     v2.Normalize([0.5], [0.5]) # Normalization
 ])
+
 # Only transforms for matching the size of images.
 test_transforms = v2.Compose([
     v2.Resize(128, 128),
@@ -44,10 +44,10 @@ test_transforms = v2.Compose([
 ])
 
 # DATASETS + DATALOADERS
-train_dataset = CNN_Dataset("dataset/train", transform = train_transforms)
+train_dataset = CNN_Dataset("dataset/train", train_transforms)
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True,)
 
-test_dataset = CNN_Dataset("dataset/test", transform = test_transforms)
+test_dataset = CNN_Dataset("dataset/test", test_transforms)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
 # INITIALIZATIONS
