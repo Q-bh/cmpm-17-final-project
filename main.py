@@ -11,6 +11,8 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.datasets as datasets
 from torchvision.transforms import v2
 
+# CLASSES
+
 # Dataset
 class CNN_Dataset(Dataset):
     def __init__(self, data, transform):
@@ -22,6 +24,15 @@ class CNN_Dataset(Dataset):
 
     def __getitem__(self, index):
         return self.data[index]
+
+# Linear Neural Network
+class CNN_LinearNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        ...
+    
+    def forward(self, input):
+        ...
         
     
 # IMAGE TRANSFORMATIONS - Increases model robustness
