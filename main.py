@@ -11,9 +11,11 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.datasets as datasets
 from torchvision.transforms import v2
 
+# CLASSES
+
 # Dataset
 class CNN_Dataset(Dataset):
-    def __init__(self, data, transform=None):
+    def __init__(self, data, transform):
         self.data = datasets.ImageFolder(root=data, transform=transform)
         self.length = len(self.data)
 
@@ -22,19 +24,37 @@ class CNN_Dataset(Dataset):
 
     def __getitem__(self, index):
         return self.data[index]
+
+# Linear Neural Network
+class CNN_Main(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=2, padding=1)
+        self.pool = nn.MaxPool2d(2, 2)
+        #self.linear1 = nn.Linear(..., ...)
+        self.relu = nn.ReLU
+    
+    def forward(self, input):
+        """
+        partial = self.conv1(input)
+        partial = self.relu(partial)
+        partial = self.pool(partial)
+        partial = partial.flatten(start_dim=1)
+        partial = self.linear1(partial)
+        """
         
     
-# IMAGE TRANSFORMATIONS
-# Making images change diversely so that the model can become more robust
+# IMAGE TRANSFORMATIONS - Increases model robustness
 train_transforms = v2.Compose([
-    v2.Resize((128, 128)), # Resizing the images to 128x128, Original data is 48x48
-    v2.RandomHorizontalFlip(), # Flipping images horizontally with 0.5 prob
-    v2.RandomRotation(30), # Rotation on images up to 30 degree
-    v2.Grayscale(1), # Images are grayscale already, but this properly makes the tensors 1 channel
-    #v2.Lambda(add_noise), # Adding noise, depending on the model performance
+    v2.Resize((128, 128)),     # Resizes image to 128x128; Original data is 48x48
+    v2.RandomHorizontalFlip(), # Flips images horizontally with 50% probability
+    v2.RandomRotation(30),     # Rotation on images up to 30 degrees
+    v2.Grayscale(1),           # Images are grayscale already, but this properly makes the tensors 1 channel
+    #v2.Lambda(add_noise),     # Adding noise, depending on the model performance
     v2.ToTensor(),
     v2.Normalize([0.5], [0.5]) # Normalization
 ])
+
 # Only transforms for matching the size of images.
 test_transforms = v2.Compose([
     v2.Resize(128, 128),
@@ -44,27 +64,20 @@ test_transforms = v2.Compose([
 ])
 
 # DATASETS + DATALOADERS
-train_dataset = CNN_Dataset("dataset/train", transform = train_transforms)
+train_dataset = CNN_Dataset("dataset/train", train_transforms)
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True,)
 
-test_dataset = CNN_Dataset("dataset/test", transform = test_transforms)
+test_dataset = CNN_Dataset("dataset/test", test_transforms)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
 # INITIALIZATIONS
-#model = NN()
-
-#loss_function = nn.L1Loss()
-
-#optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
-
-#
-NUM_EPOCHS = 1
+model = CNN_Main()
 
 # TRAINING LOOP
 for i in range(NUM_EPOCHS):
 
     for image, label in train_dataloader:
-        print(f"<{image}>  <- SAMPLE STUFF, OUTPUT/LABELS: {label}")
+        print(f"{image.shape}  <- SAMPLE STUFF, OUTPUT/LABELS: {label.shape}")
 
         # Sample code from midterm; uncomment & use when implementing real loop
         """
