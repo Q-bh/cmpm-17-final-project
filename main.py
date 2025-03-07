@@ -26,13 +26,22 @@ class CNN_Dataset(Dataset):
         return self.data[index]
 
 # Linear Neural Network
-class CNN_LinearNN(nn.Module):
+class CNN_Main(nn.Module):
     def __init__(self):
         super().__init__()
-        ...
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=1, kernel_size=2, padding=1)
+        self.pool = nn.MaxPool2d(2, 2)
+        #self.linear1 = nn.Linear(..., ...)
+        self.relu = nn.ReLU
     
     def forward(self, input):
-        ...
+        """
+        partial = self.conv1(input)
+        partial = self.relu(partial)
+        partial = self.pool(partial)
+        partial = partial.flatten(start_dim=1)
+        partial = self.linear1(partial)
+        """
         
     
 # IMAGE TRANSFORMATIONS - Increases model robustness
@@ -62,7 +71,7 @@ test_dataset = CNN_Dataset("dataset/test", test_transforms)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
 # INITIALIZATIONS
-#model = NN()
+model = CNN_Main()
 
 #loss_function = nn.L1Loss()
 
@@ -75,7 +84,7 @@ NUM_EPOCHS = 1
 for i in range(NUM_EPOCHS):
 
     for image, label in train_dataloader:
-        print(f"<{image}>  <- SAMPLE STUFF, OUTPUT/LABELS: {label}")
+        print(f"{image.shape}  <- SAMPLE STUFF, OUTPUT/LABELS: {label.shape}")
 
         # Sample code from midterm; uncomment & use when implementing real loop
         """
