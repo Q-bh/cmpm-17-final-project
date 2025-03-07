@@ -73,6 +73,13 @@ test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 # INITIALIZATIONS
 model = CNN_Main()
 
+#loss_function = nn.L1Loss()
+
+#optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
+
+#
+NUM_EPOCHS = 1
+
 # TRAINING LOOP
 for i in range(NUM_EPOCHS):
 
