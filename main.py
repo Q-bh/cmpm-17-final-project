@@ -30,6 +30,9 @@ class CNN_Main(nn.Module):
     def __init__(self, num_classes = 6):
         super().__init__()
 
+        # Two convolutional layers to avoid overfitting.
+        # More layers can be added depending on the performance.
+
         # First convolution: Input channel = 1(Gray Scale) -> Output Channel = 16
         # Input: (batch_size, 1, 128, 128)
         # conv1: (batch_size, 16, 128, 128) [kernel_size = 3, padding = 1]
@@ -61,7 +64,7 @@ class CNN_Main(nn.Module):
         x = self.relu(x)
         x = self.pool(x)
 
-        x = x.flatten(1)
+        x = x.flatten(start_dim = 1)
 
         x = self.fc1(x)
         x = self.relu(x)
