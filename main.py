@@ -101,44 +101,41 @@ test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 # INITIALIZATIONS
 model = CNN_Main()
 
-#loss_function = nn.L1Loss()
+# HOW TO READ CROSS ENTROPY LOSS:
+# For an n-class problem, randomly guessing should create an expected loss of -ln(1/n)
+# For this model, of 6 classes, it's -ln(1/6) = 1.79
+# Essentially, the model will start around 1.79 loss and should slowly go down from there
+loss_function = nn.CrossEntropyLoss()
 
-#optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
 
 #
 NUM_EPOCHS = 1
 
 # TRAINING LOOP
-for i in range(NUM_EPOCHS):
+for _ in range(NUM_EPOCHS):
 
     for image, label in train_dataloader:
-        print(f"{image.shape}  <- SAMPLE STUFF, OUTPUT/LABELS: {label.shape}")
-
-        # Sample code from midterm; uncomment & use when implementing real loop
-        """
         # PREDICT - Pass training inputs through neural network
         pred = model(image)
 
         # SCORE - Higher number = Worse performance
         loss = loss_function(pred, label)
+        print(f"TRAIN: {loss.item()}")
 
         # LEARN
         loss.backward()       # Calculates function slope
         optimizer.step()      # Updates model parameters
         optimizer.zero_grad() # Resets optimizer to be ready for next epoch
-        """
+        
 
 # TESTING LOOP    
 with torch.no_grad():
 
     for image, label in test_dataloader:
-        print(f"<{image}>  <- SAMPLE STUFF, OUTPUT/LABELS: {label}")
-
-        # Sample code from midterm; uncomment & use when implementing real loop
-        """
         # PREDICT
         pred = model(image)
 
         # SCORE
         loss = loss_function(pred, label)
-        """
+        print(f"TEST: {loss.item()}")
