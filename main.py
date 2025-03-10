@@ -49,7 +49,7 @@ class CNN_Main(nn.Module):
         # Final feature map: (batch_size, 32, 32, 32)
         # Flatten = 32 * 32 * 32 = 32786 dimensions
 
-        self.fc1 = nn.linear(32 * 32 * 32, 128)
+        self.fc1 = nn.Linear(32 * 32 * 32, 128)
         self.fc2 = nn.Linear(128, num_classes)
 
     def forward(self, input):
@@ -85,7 +85,7 @@ train_transforms = v2.Compose([
 
 # Only transforms for matching the size of images.
 test_transforms = v2.Compose([
-    v2.Resize(128, 128),
+    v2.Resize((128, 128)),
     v2.Grayscale(1),
     v2.ToTensor(),
     v2.Normalize([0.5], [0.5])
@@ -93,7 +93,7 @@ test_transforms = v2.Compose([
 
 # DATASETS + DATALOADERS
 train_dataset = CNN_Dataset("dataset/train", train_transforms)
-train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True,)
+train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
 test_dataset = CNN_Dataset("dataset/test", test_transforms)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
