@@ -33,7 +33,7 @@ class CNN_Main(nn.Module):
         # Two convolutional layers to avoid overfitting.
         # More layers can be added depending on the performance.
 
-        # First convolution: Input channel = 1(Gray Scale) -> Output Channel = 16
+        # First convolution:    
         # Input: (batch_size, 1, 128, 128)
         # conv1: (batch_size, 16, 128, 128) [kernel_size = 3, padding = 1]
         self.conv1 = nn.Conv2d(in_channels = 1, out_channels = 16, kernel_size = 3, padding = 1)
@@ -110,14 +110,21 @@ loss_function = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
 
 #
-NUM_EPOCHS = 1
+NUM_EPOCHS = 3
 
 # TRAINING LOOP
-for _ in range(NUM_EPOCHS):
+for epoch in range(NUM_EPOCHS):
+    model.train()
+    total_loss_epoch = 0.0
+    correct_pred = 0
+    total_pred = 0
 
     for image, label in train_dataloader:
         # PREDICT - Pass training inputs through neural network
         pred = model(image)
+
+        # Loss calculation with CrossEntropy
+        loss = loss_function(pred, label)
 
         # torch.softmax() - Convert predictions into confidences
         confidences = torch.softmax(pred, dim=1) 
@@ -125,23 +132,49 @@ for _ in range(NUM_EPOCHS):
         # torch.max() - Get most confident class and its probability
         max_confidences, predictions = torch.max(confidences, dim=1)
 
-        # SCORE - Higher number = Worse performance
-        loss = loss_function(pred, label)
-        print(f"Loss: {loss.item()}\nPredicted: {predictions}\nConfidences: {max_confidences}\n")
+        # Loss for epochs and batches
+        total_loss_epoch += loss.item() * image.size(0) # loss for one epoch
+        total_pred += label.size(0) # Same as the batch size
+        correct_pred += (predictions == label).sum().item() # How many images did the model predict correctly
 
         # LEARN
         loss.backward()       # Calculates function slope
         optimizer.step()      # Updates model parameters
         optimizer.zero_grad() # Resets optimizer to be ready for next epoch
+
+        # SCORE - Higher number = Worse performance, it's per one batch
+        print(f"Batch Loss: {loss.item():.4f}")
+        print(f"Predicted: {predictions}")
+        print(f"Confidences: {max_confidences}\n")
         
+    # Average loss and accuracy calculation after one epoch
+    avg_loss_epoch = total_loss_epoch / total_pred
+    accuracy_epoch = correct_pred / total_pred
+    print(f"Epoch {epoch+1} - Average Loss: {avg_loss_epoch:.4f}, Accuracy: {accuracy_epoch:.4f}\n")
 
-# TESTING LOOP    
-with torch.no_grad():
+# TESTING LOOP
+# We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
+# model.eval()
+# total_loss_test = 0.0
+# correct_test = 0
+# total_test = 0
 
-    for image, label in test_dataloader:
-        # PREDICT
-        pred = model(image)
+# with torch.no_grad():
 
-        # SCORE
-        loss = loss_function(pred, label)
-        print(f"TEST: {loss.item()}")
+#     for image, label in test_dataloader:
+#         # PREDICT
+#         pred = model(image)
+
+#         # SCORE
+#         loss = loss_function(pred, label)
+#         total_loss_test += loss.item() * image.size(0)
+#         total_test += label.size()
+
+#         confidences = torch.softmax(pred, dim = 1)
+#         max_confidences, predictions = torch.max(confidences, dim = 1)
+#         correct_test += (predictions == label).sum().item()
+
+# avg_loss_test = total_loss_test / total_test
+# accuracy_test = correct_test / total_test
+
+# print(f"Test Set - Average Loss: {avg_loss_test:.4f}, Accuracy: {accuracy_test:.4f}")
