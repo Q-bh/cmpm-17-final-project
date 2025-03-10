@@ -119,9 +119,15 @@ for _ in range(NUM_EPOCHS):
         # PREDICT - Pass training inputs through neural network
         pred = model(image)
 
+        # torch.softmax() - Convert predictions into confidences
+        confidences = torch.softmax(pred, dim=1) 
+
+        # torch.max() - Get most confident class and its probability
+        max_confidences, predictions = torch.max(confidences, dim=1)
+
         # SCORE - Higher number = Worse performance
         loss = loss_function(pred, label)
-        print(f"TRAIN: {loss.item()}")
+        print(f"Loss: {loss.item()}\nPredicted: {predictions}\nConfidences: {max_confidences}\n")
 
         # LEARN
         loss.backward()       # Calculates function slope
