@@ -62,12 +62,12 @@ class CNN_Main(nn.Module):
         # The original data is 48*48, but we transform the image size to 128*128
 
         x = self.conv1(input)
-        x = self.bn1(x)
+        #x = self.bn1(x)
         x = self.relu(x)
         x = self.pool(x)
         
         x = self.conv2(x)
-        x = self.bn2(x)
+        #x = self.bn2(x)
         x = self.relu(x)
         x = self.pool(x)
 
@@ -75,7 +75,7 @@ class CNN_Main(nn.Module):
 
         x = self.fc1(x)
         x = self.relu(x)
-        x = self.dropout(x)
+        #x = self.dropout(x)
         x = self.fc2(x)
 
         return x
@@ -116,7 +116,7 @@ def main():
     # Essentially, the model will start around 1.79 loss and should slowly go down from there
     loss_function = nn.CrossEntropyLoss()
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001) # We can add L2 Norm here with weight_decay = 0.0001 as a parameter
 
     #
     NUM_EPOCHS = 3
