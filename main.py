@@ -7,7 +7,7 @@ import pandas as pd
 from PIL import Image
 from sklearn.preprocessing import StandardScaler
 import torch, torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, Subset
 import torchvision.datasets as datasets
 from torchvision.transforms import v2
 
@@ -97,6 +97,18 @@ def main():
     train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
     test_dataset = CNN_Dataset("dataset/test", test_transforms)
+
+    # Mixing test dataset indices randomly and then divided it by half
+    indices = np.random.permutation(len(test_dataset))
+    half = len(indices) // 2
+    validation_indices = indices[:half]
+    test_indices = indices[half:]
+
+    # Dividing the test set into two, one is for the validation
+    validation_dataset = Subset(test_dataset, validation_indices)
+    test_dataset = Subset(test_dataset, test_indices)
+
+    validation_dataloader = DataLoader(validation_dataset, batch_size=32, shuffle=True)
     test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
     # INITIALIZATIONS
@@ -147,12 +159,35 @@ def main():
             print(f"Batch Loss: {loss.item():.4f}")
             print(f"Predicted: {predictions}")
             print(f"Confidences: {max_confidences}\n")
-            
-        # Average loss and accuracy calculation after one epoch
-        avg_loss_epoch = total_loss_epoch / total_pred
-        accuracy_epoch = correct_pred / total_pred
-        print(f"Epoch {epoch+1} - Average Loss: {avg_loss_epoch:.4f}, Accuracy: {accuracy_epoch:.4f}\n")
+        
+    # Average loss and accuracy calculation after one epoch
+    avg_loss_epoch = total_loss_epoch / total_pred
+    accuracy_epoch = correct_pred / total_pred
+    print(f"Epoch {epoch+1} - Average Loss: {avg_loss_epoch:.4f}, Accuracy: {accuracy_epoch:.4f}\n")
 
+    # VALIDATION LOOP
+    model.eval()
+    val_loss_epoch = 0.0
+    val_correct_pred = 0
+    val_total_pred = 0
+
+    with torch.no_grad():
+        for image, label in validation_dataloader:
+            # PREDICT
+            pred = model(image)
+            # SCORE
+            loss = loss_function(pred, label)
+            val_loss_epoch += loss.item() * image.size(0)
+            val_total_pred += label.size(0)
+            
+            confidences = torch.softmax(pred, dim=1)
+            max_confidences, predictions = torch.max(confidences, dim=1)
+            val_correct_pred += (predictions == label).sum().item()
+
+    avg_val_loss = val_loss_epoch / val_total_pred
+    accuracy_val = val_correct_pred / val_total_pred
+    print(f"Epoch {epoch+1} - Validation Average Loss: {avg_val_loss:.4f}, Accuracy: {accuracy_val:.4f}\n")
+    
     # TESTING LOOP
     # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
     # model.eval()
@@ -160,25 +195,25 @@ def main():
     # correct_test = 0
     # total_test = 0
 
-    # with torch.no_grad():
+        # with torch.no_grad():
 
-    #     for image, label in test_dataloader:
-    #         # PREDICT
-    #         pred = model(image)
+        #     for image, label in test_dataloader:
+        #         # PREDICT
+        #         pred = model(image)
 
-    #         # SCORE
-    #         loss = loss_function(pred, label)
-    #         total_loss_test += loss.item() * image.size(0)
-    #         total_test += label.size()
+        #         # SCORE
+        #         loss = loss_function(pred, label)
+        #         total_loss_test += loss.item() * image.size(0)
+        #         total_test += label.size()
 
-    #         confidences = torch.softmax(pred, dim = 1)
-    #         max_confidences, predictions = torch.max(confidences, dim = 1)
-    #         correct_test += (predictions == label).sum().item()
+        #         confidences = torch.softmax(pred, dim = 1)
+        #         max_confidences, predictions = torch.max(confidences, dim = 1)
+        #         correct_test += (predictions == label).sum().item()
 
-    # avg_loss_test = total_loss_test / total_test
-    # accuracy_test = correct_test / total_test
+        # avg_loss_test = total_loss_test / total_test
+        # accuracy_test = correct_test / total_test
 
-    # print(f"Test Set - Average Loss: {avg_loss_test:.4f}, Accuracy: {accuracy_test:.4f}")
+        # print(f"Test Set - Average Loss: {avg_loss_test:.4f}, Accuracy: {accuracy_test:.4f}")
 
 if __name__ == "__main__":
     main()
