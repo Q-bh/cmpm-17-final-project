@@ -71,110 +71,114 @@ class CNN_Main(nn.Module):
         x = self.fc2(x)
 
         return x
-    
-# IMAGE TRANSFORMATIONS - Increases model robustness
-train_transforms = v2.Compose([
-    v2.Resize((128, 128)),     # Resizes image to 128x128; Original data is 48x48
-    v2.RandomHorizontalFlip(), # Flips images horizontally with 50% probability
-    v2.RandomRotation(30),     # Rotation on images up to 30 degrees
-    v2.Grayscale(1),           # Images are grayscale already, but this properly makes the tensors 1 channel
-    #v2.Lambda(add_noise),     # Adding noise, depending on the model performance
-    v2.ToTensor(),
-    v2.Normalize([0.5], [0.5]) # Normalization
-])
 
-# Only transforms for matching the size of images.
-test_transforms = v2.Compose([
-    v2.Resize((128, 128)),
-    v2.Grayscale(1),
-    v2.ToTensor(),
-    v2.Normalize([0.5], [0.5])
-])
+def main(): 
+    # IMAGE TRANSFORMATIONS - Increases model robustness
+    train_transforms = v2.Compose([
+        v2.Resize((128, 128)),     # Resizes image to 128x128; Original data is 48x48
+        v2.RandomHorizontalFlip(), # Flips images horizontally with 50% probability
+        v2.RandomRotation(30),     # Rotation on images up to 30 degrees
+        v2.Grayscale(1),           # Images are grayscale already, but this properly makes the tensors 1 channel
+        #v2.Lambda(add_noise),     # Adding noise, depending on the model performance
+        v2.ToTensor(),
+        v2.Normalize([0.5], [0.5]) # Normalization
+    ])
 
-# DATASETS + DATALOADERS
-train_dataset = CNN_Dataset("dataset/train", train_transforms)
-train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    # Only transforms for matching the size of images.
+    test_transforms = v2.Compose([
+        v2.Resize((128, 128)),
+        v2.Grayscale(1),
+        v2.ToTensor(),
+        v2.Normalize([0.5], [0.5])
+    ])
 
-test_dataset = CNN_Dataset("dataset/test", test_transforms)
-test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
+    # DATASETS + DATALOADERS
+    train_dataset = CNN_Dataset("dataset/train", train_transforms)
+    train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
-# INITIALIZATIONS
-model = CNN_Main()
+    test_dataset = CNN_Dataset("dataset/test", test_transforms)
+    test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
-# HOW TO READ CROSS ENTROPY LOSS:
-# For an n-class problem, randomly guessing should create an expected loss of -ln(1/n)
-# For this model, of 6 classes, it's -ln(1/6) = 1.79
-# Essentially, the model will start around 1.79 loss and should slowly go down from there
-loss_function = nn.CrossEntropyLoss()
+    # INITIALIZATIONS
+    model = CNN_Main()
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
+    # HOW TO READ CROSS ENTROPY LOSS:
+    # For an n-class problem, randomly guessing should create an expected loss of -ln(1/n)
+    # For this model, of 6 classes, it's -ln(1/6) = 1.79
+    # Essentially, the model will start around 1.79 loss and should slowly go down from there
+    loss_function = nn.CrossEntropyLoss()
 
-#
-NUM_EPOCHS = 3
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
 
-# TRAINING LOOP
-for epoch in range(NUM_EPOCHS):
-    model.train()
-    total_loss_epoch = 0.0
-    correct_pred = 0
-    total_pred = 0
+    #
+    NUM_EPOCHS = 3
 
-    for image, label in train_dataloader:
-        # PREDICT - Pass training inputs through neural network
-        pred = model(image)
+    # TRAINING LOOP
+    for epoch in range(NUM_EPOCHS):
+        model.train()
+        total_loss_epoch = 0.0
+        correct_pred = 0
+        total_pred = 0
 
-        # Loss calculation with CrossEntropy
-        loss = loss_function(pred, label)
+        for image, label in train_dataloader:
+            # PREDICT - Pass training inputs through neural network
+            pred = model(image)
 
-        # torch.softmax() - Convert predictions into confidences
-        confidences = torch.softmax(pred, dim=1) 
+            # Loss calculation with CrossEntropy
+            loss = loss_function(pred, label)
 
-        # torch.max() - Get most confident class and its probability
-        max_confidences, predictions = torch.max(confidences, dim=1)
+            # torch.softmax() - Convert predictions into confidences
+            confidences = torch.softmax(pred, dim=1) 
 
-        # Loss for epochs and batches
-        total_loss_epoch += loss.item() * image.size(0) # loss for one epoch
-        total_pred += label.size(0) # Same as the batch size
-        correct_pred += (predictions == label).sum().item() # How many images did the model predict correctly
+            # torch.max() - Get most confident class and its probability
+            max_confidences, predictions = torch.max(confidences, dim=1)
 
-        # LEARN
-        loss.backward()       # Calculates function slope
-        optimizer.step()      # Updates model parameters
-        optimizer.zero_grad() # Resets optimizer to be ready for next epoch
+            # Loss for epochs and batches
+            total_loss_epoch += loss.item() * image.size(0) # loss for one epoch
+            total_pred += label.size(0) # Same as the batch size
+            correct_pred += (predictions == label).sum().item() # How many images did the model predict correctly
 
-        # SCORE - Higher number = Worse performance, it's per one batch
-        print(f"Batch Loss: {loss.item():.4f}")
-        print(f"Predicted: {predictions}")
-        print(f"Confidences: {max_confidences}\n")
-        
-    # Average loss and accuracy calculation after one epoch
-    avg_loss_epoch = total_loss_epoch / total_pred
-    accuracy_epoch = correct_pred / total_pred
-    print(f"Epoch {epoch+1} - Average Loss: {avg_loss_epoch:.4f}, Accuracy: {accuracy_epoch:.4f}\n")
+            # LEARN
+            loss.backward()       # Calculates function slope
+            optimizer.step()      # Updates model parameters
+            optimizer.zero_grad() # Resets optimizer to be ready for next epoch
 
-# TESTING LOOP
-# We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
-# model.eval()
-# total_loss_test = 0.0
-# correct_test = 0
-# total_test = 0
+            # SCORE - Higher number = Worse performance, it's per one batch
+            print(f"Batch Loss: {loss.item():.4f}")
+            print(f"Predicted: {predictions}")
+            print(f"Confidences: {max_confidences}\n")
+            
+        # Average loss and accuracy calculation after one epoch
+        avg_loss_epoch = total_loss_epoch / total_pred
+        accuracy_epoch = correct_pred / total_pred
+        print(f"Epoch {epoch+1} - Average Loss: {avg_loss_epoch:.4f}, Accuracy: {accuracy_epoch:.4f}\n")
 
-# with torch.no_grad():
+    # TESTING LOOP
+    # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
+    # model.eval()
+    # total_loss_test = 0.0
+    # correct_test = 0
+    # total_test = 0
 
-#     for image, label in test_dataloader:
-#         # PREDICT
-#         pred = model(image)
+    # with torch.no_grad():
 
-#         # SCORE
-#         loss = loss_function(pred, label)
-#         total_loss_test += loss.item() * image.size(0)
-#         total_test += label.size()
+    #     for image, label in test_dataloader:
+    #         # PREDICT
+    #         pred = model(image)
 
-#         confidences = torch.softmax(pred, dim = 1)
-#         max_confidences, predictions = torch.max(confidences, dim = 1)
-#         correct_test += (predictions == label).sum().item()
+    #         # SCORE
+    #         loss = loss_function(pred, label)
+    #         total_loss_test += loss.item() * image.size(0)
+    #         total_test += label.size()
 
-# avg_loss_test = total_loss_test / total_test
-# accuracy_test = correct_test / total_test
+    #         confidences = torch.softmax(pred, dim = 1)
+    #         max_confidences, predictions = torch.max(confidences, dim = 1)
+    #         correct_test += (predictions == label).sum().item()
 
-# print(f"Test Set - Average Loss: {avg_loss_test:.4f}, Accuracy: {accuracy_test:.4f}")
+    # avg_loss_test = total_loss_test / total_test
+    # accuracy_test = correct_test / total_test
+
+    # print(f"Test Set - Average Loss: {avg_loss_test:.4f}, Accuracy: {accuracy_test:.4f}")
+
+if __name__ == "__main__":
+    main()
