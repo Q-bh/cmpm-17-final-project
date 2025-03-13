@@ -81,6 +81,14 @@ class CNN_Main(nn.Module):
         return x
 
 def main(): 
+    # DEVICE SELECTION
+    if torch.cuda.is_available():
+        device = 'cuda'
+        print('CUDA is available. Using GPU.')
+    else:
+        device = 'cpu'
+        print('CUDA is not available. Using CPU.')
+
     # IMAGE TRANSFORMATIONS - Increases model robustness
     train_transforms = v2.Compose([
         v2.Resize((128, 128)),     # Resizes image to 128x128; Original data is 48x48
@@ -120,7 +128,7 @@ def main():
     test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
     # INITIALIZATIONS
-    model = CNN_Main()
+    model = CNN_Main().to("cuda")
 
     # HOW TO READ CROSS ENTROPY LOSS:
     # For an n-class problem, randomly guessing should create an expected loss of -ln(1/n)
@@ -141,6 +149,10 @@ def main():
         total_pred = 0
 
         for image, label in train_dataloader:
+
+            image = image.to("cuda")
+            label = label.to("cuda")
+
             # PREDICT - Pass training inputs through neural network
             pred = model(image)
 
@@ -181,6 +193,10 @@ def main():
 
     with torch.no_grad():
         for image, label in validation_dataloader:
+            
+            image = image.to("cuda")
+            label = label.to("cuda")
+
             # PREDICT
             pred = model(image)
             # SCORE
@@ -204,8 +220,10 @@ def main():
     # total_test = 0
 
     # with torch.no_grad():
+    #       for image, label in test_dataloader:
 
-    #     for image, label in test_dataloader:
+    #       image = image.to("cuda")
+    #       label = label.to("cuda")
     #         # PREDICT
     #         pred = model(image)
 
