@@ -10,6 +10,9 @@ import torch, torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, Subset
 import torchvision.datasets as datasets
 from torchvision.transforms import v2
+import wandb
+import time
+import random
 
 # CLASSES
 
@@ -89,6 +92,9 @@ def main():
         device = 'cpu'
         print('CUDA is not available. Using CPU.')
 
+    # wandb initialization: Saving the name of run and project
+    run = wandb.init(project="CMPM17_FINAL", name="March 12")
+
     # IMAGE TRANSFORMATIONS - Increases model robustness
     train_transforms = v2.Compose([
         v2.Resize((128, 128)),     # Resizes image to 128x128; Original data is 48x48
@@ -136,10 +142,10 @@ def main():
     # Essentially, the model will start around 1.79 loss and should slowly go down from there
     loss_function = nn.CrossEntropyLoss()
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001) ###
 
-    #
-    NUM_EPOCHS = 3
+    ###
+    NUM_EPOCHS = 100
 
     # TRAINING LOOP
     for epoch in range(NUM_EPOCHS):
@@ -175,6 +181,9 @@ def main():
             optimizer.step()      # Updates model parameters
             optimizer.zero_grad() # Resets optimizer to be ready for next epoch
 
+            # Saving learning metrics in each batches on wandb
+            run.log({"batch_loss": loss.item()})
+
             # SCORE - Higher number = Worse performance, it's per one batch
             print(f"Batch Loss: {loss.item():.4f}")
             print(f"Predicted: {predictions}")
@@ -184,6 +193,9 @@ def main():
     avg_loss_epoch = total_loss_epoch / total_pred
     accuracy_epoch = correct_pred / total_pred
     print(f"Epoch {epoch+1} - Average Loss: {avg_loss_epoch:.4f}, Accuracy: {accuracy_epoch:.4f}\n")
+
+    # Saving learning metrics in each epoches on wandb
+    run.log({"epoch": epoch+1, "train_loss": avg_loss_epoch, "train_accuracy": accuracy_epoch})
 
     # VALIDATION LOOP
     model.eval()
@@ -211,6 +223,9 @@ def main():
     avg_val_loss = val_loss_epoch / val_total_pred
     accuracy_val = val_correct_pred / val_total_pred
     print(f"Epoch {epoch+1} - Validation Average Loss: {avg_val_loss:.4f}, Accuracy: {accuracy_val:.4f}\n")
+
+    # Saving validation metrics  on wandb
+    run.log({"epoch": epoch+1, "val_loss": avg_val_loss, "val_accuracy": accuracy_val})
     
     # TESTING LOOP
     # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
@@ -240,6 +255,11 @@ def main():
     # accuracy_test = correct_test / total_test
 
     # print(f"Test Set - Average Loss: {avg_loss_test:.4f}, Accuracy: {accuracy_test:.4f}")
+
+    # Saving test metrics on wandb as well
+    # run.log({"epoch": epoch+1, "test_loss": avg_loss_test, "test_accuracy": accuracy_test})
+
+    run.finish() # wandb run execution
 
 if __name__ == "__main__":
     main()
