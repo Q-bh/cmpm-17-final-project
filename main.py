@@ -134,7 +134,7 @@ def main():
     test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
     # INITIALIZATIONS
-    model = CNN_Main().to("cuda")
+    model = CNN_Main().to(device)
 
     # HOW TO READ CROSS ENTROPY LOSS:
     # For an n-class problem, randomly guessing should create an expected loss of -ln(1/n)
@@ -144,7 +144,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001) ###
 
-    ###
+    # [Add reasoning for epoch amount]
     NUM_EPOCHS = 100
 
     # TRAINING LOOP
@@ -156,8 +156,8 @@ def main():
 
         for image, label in train_dataloader:
 
-            image = image.to("cuda")
-            label = label.to("cuda")
+            image = image.to(device)
+            label = label.to(device)
 
             # PREDICT - Pass training inputs through neural network
             pred = model(image)
@@ -206,8 +206,8 @@ def main():
     with torch.no_grad():
         for image, label in validation_dataloader:
             
-            image = image.to("cuda")
-            label = label.to("cuda")
+            image = image.to(device)
+            label = label.to(device)
 
             # PREDICT
             pred = model(image)
@@ -237,8 +237,8 @@ def main():
     # with torch.no_grad():
     #       for image, label in test_dataloader:
 
-    #       image = image.to("cuda")
-    #       label = label.to("cuda")
+    #       image = image.to(device)
+    #       label = label.to(device)
     #         # PREDICT
     #         pred = model(image)
 
