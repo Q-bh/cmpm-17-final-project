@@ -31,8 +31,8 @@ class CNN_Dataset(Dataset):
 # Linear Neural Network
 class CNN_Main(nn.Module):
     def __init__(self, num_classes = 6, dropout_rate=0.5, conv1_channels=16, conv2_channels=32,
-                 fc1_units=128, conv1_kernel_size = 3, conv1_padding_size = 1, activation=nn.ReLU(),
-                 pool_kernel_size=2, pool_stride_size=2, conv2_kernel_size = 3, conv2_padding_size = 1):
+                fc1_units=128, conv1_kernel_size = 3, conv1_padding_size = 1, activation=nn.ReLU(),
+                pool_kernel_size=2, pool_stride_size=2, conv2_kernel_size = 3, conv2_padding_size = 1):
         super().__init__()
 
         # Two convolutional layers to avoid overfitting.
@@ -147,7 +147,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001) ###
 
     ###
-    NUM_EPOCHS = 30
+    NUM_EPOCHS = 1
 
     # TRAINING LOOP
     for epoch in range(NUM_EPOCHS):
@@ -199,7 +199,7 @@ def main():
 
         with torch.no_grad():
             for image, label in validation_dataloader:
-                
+                    
                 image = image.to(device)
                 label = label.to(device)
 
@@ -209,7 +209,7 @@ def main():
                 loss = loss_function(pred, label)
                 val_loss += loss.item() * image.size(0)
                 val_total_pred += label.size(0)
-                
+                    
                 confidences = torch.softmax(pred, dim=1)
                 max_confidences, predictions = torch.max(confidences, dim=1)
                 val_correct_pred += (predictions == label).sum().item()
@@ -223,7 +223,7 @@ def main():
     print(f"Epoch {epoch+1} - Average Loss: {avg_loss_epoch:.4f}, Accuracy: {avg_accuracy_epoch:.4f}\n")
 
     # Saving learning metrics in each epoches on wandb
-    run.log({"epoch": epoch+1, "train_loss": avg_loss_epoch, "avg_train_accuracy": avg_accuracy_epoch})
+    run.log({"train_loss": avg_loss_epoch, "avg_train_accuracy": avg_accuracy_epoch})
 
     # Average loss and accuracy calculation after one epoch on validation
     avg_val_loss = val_loss / val_total_pred
@@ -231,7 +231,7 @@ def main():
     print(f"Epoch {epoch+1} - Validation Average Loss: {avg_val_loss:.4f}, Accuracy: {accuracy_val:.4f}\n")
 
     # Saving validation metrics on wandb
-    run.log({"epoch": epoch+1, "val_loss": avg_val_loss, "val_accuracy": accuracy_val})
+    run.log({"val_loss": avg_val_loss, "val_accuracy": accuracy_val})
     
     # TESTING LOOP
     # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
@@ -266,7 +266,7 @@ def main():
     # print(f"Test Set - Average Loss: {avg_loss_test:.4f}, Accuracy: {accuracy_test:.4f}")
 
     # Saving test metrics on wandb as well
-    # run.log({"epoch": epoch+1, "test_loss": avg_loss_test, "test_accuracy": accuracy_test})
+    # run.log({"test_loss": avg_loss_test, "test_accuracy": accuracy_test})
 
     run.finish() # wandb run execution
 

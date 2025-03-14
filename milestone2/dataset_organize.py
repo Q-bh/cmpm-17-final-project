@@ -2,7 +2,7 @@ import os
 import shutil
 import random
 
-# Moving the images
+# Moving the images from disgust to angry
 source_folder = "../dataset/train/disgust"
 destination_folder = "../dataset/train/angry"
 
