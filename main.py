@@ -67,12 +67,12 @@ class CNN_Main(nn.Module):
         # The original data is 48*48, but we transform the image size to 128*128
 
         x = self.conv1(input)
-        #x = self.bn1(x)
+        x = self.bn1(x)
         x = self.relu(x)
         x = self.pool(x)
         
         x = self.conv2(x)
-        #x = self.bn2(x)
+        x = self.bn2(x)
         x = self.relu(x)
         x = self.pool(x)
 
@@ -231,7 +231,7 @@ def main():
     print(f"Epoch {epoch+1} - Validation Average Loss: {avg_val_loss:.4f}, Accuracy: {accuracy_val:.4f}\n")
 
     # Saving validation metrics on wandb
-    run.log({"val_loss": avg_val_loss, "val_accuracy": accuracy_val})
+    run.log({"abg_val_loss": avg_val_loss, "avg_val_accuracy": accuracy_val})
     
     # TESTING LOOP
     # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
