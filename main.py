@@ -13,7 +13,27 @@ from torch.utils.data import Dataset, DataLoader, Subset
 import torchvision.datasets as datasets
 from torchvision.transforms import v2
 import wandb
-import torch.optim.lr_scheduler.ExponentialLR as ExpLR
+from torch.optim.lr_scheduler import ExponentialLR as ExpLR
+
+
+# Hyperparameters
+dropout_rate = 0.5
+conv1_out_channels = 16
+conv1_kernel_size = 3
+conv1_padding = 1
+conv2_out_channels = 32,
+conv2_kernel_size = 3
+conv2_padding = 1
+conv3_out_channels = 64
+conv3_kernel_size = 3
+conv3_padding = 1
+batch_size = 32
+fc1_units = 128
+batch_norm = True   # Batch Normalization On/Off
+lr = 0.001
+NUM_EPOCHS = 30
+scheduler = False   # Scheduler On/Off
+weight_decay = False    # Weight_decay On/Off
 
 # CLASSES
 
@@ -31,7 +51,7 @@ class CNN_Dataset(Dataset):
 
 # Linear Neural Network
 class CNN_Main(nn.Module):
-    def __init__(self, num_classes = 6, dropout_rate=0.5, fc1_units=128):
+    def __init__(self, num_classes = 6):
         super().__init__()
 
         # Two convolutional layers to avoid overfitting.
@@ -40,18 +60,18 @@ class CNN_Main(nn.Module):
         # First convolution:
         # Input: (batch_size, 1, 128, 128)
         # conv1: (batch_size, 16, 128, 128) [kernel_size = 3, padding = 1]
-        self.conv1 = nn.Conv2d(in_channels = 1, out_channels = 16, kernel_size = 3, padding = 1)
-        self.bn1 = nn.BatchNorm2d(16) # Batch normalization, output channel is 16
+        self.conv1 = nn.Conv2d(in_channels = 1, out_channels = conv1_out_channels, kernel_size = conv1_kernel_size, padding = conv2_kernel_size)
+        self.bn1 = nn.BatchNorm2d(conv1_out_channels) # Batch normalization, output channel is 16
         self.pool = nn.MaxPool2d(kernel_size = 2, stride = 2) # Make the image as a half size (64)
 
         # Second convolution: Input channel = 16 -> Output Channel = 32
         # Input: (batch_size, 16, 64, 64)
         # conv2: (batch_size, 32, 64, 64) [kernel_size = 3, padding = 1]
-        self.conv2 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3, padding = 1)
-        self.bn2 = nn.BatchNorm2d(32) # Batch normalization, output channel is 32
+        self.conv2 = nn.Conv2d(in_channels = conv1_out_channels, out_channels = conv2_out_channels, kernel_size = conv2_kernel_size, padding = conv2_padding)
+        self.bn2 = nn.BatchNorm2d(conv2_out_channels) # Batch normalization, output channel is 32
 
-        self.conv3 = nn.Conv2d(in_channels = 32, out_channels = 64, kernel_size = 3, padding = 1)
-        self.bn3 = nn.BatchNorm2d(64)
+        self.conv3 = nn.Conv2d(in_channels = conv2_out_channels, out_channels = conv3_out_channels, kernel_size = conv3_kernel_size, padding = conv3_padding)
+        self.bn3 = nn.BatchNorm2d(conv3_out_channels)
         self.relu = nn.ReLU()
 
         # Dropout layer
@@ -61,7 +81,7 @@ class CNN_Main(nn.Module):
         # Final feature map: (batch_size, 64, 16, 16)
         # Flatten = 32 * 32 * 32 
 
-        self.fc1 = nn.Linear(64 * 16 * 16, fc1_units) # 16, 16 are when pool kernel = 2, pool stride = 2
+        self.fc1 = nn.Linear(conv3_out_channels * 16 * 16, fc1_units) # 16, 16 are when pool kernel = 2, pool stride = 2
         self.fc2 = nn.Linear(fc1_units, num_classes)
 
     def forward(self, input):
@@ -87,7 +107,7 @@ class CNN_Main(nn.Module):
 
         x = self.fc1(x)
         x = self.relu(x)
-        x = self.dropout(x)
+        #x = self.dropout(x)
         x = self.fc2(x)
 
         return x
@@ -98,7 +118,29 @@ def main():
     print(f"Using device: {device}")
 
     # wandb initialization: Saving the name of run and project
-    run = wandb.init(project="CMPM17_FINAL", name="March 14, epoch 20, conv3")
+    config = {
+    "dropout_rate": dropout_rate,
+    "conv1_out_channels": conv1_out_channels,
+    "conv1_kernel_size": conv1_kernel_size,
+    "conv1_padding": conv1_padding,
+    "conv2_out_channels": conv2_out_channels,
+    "conv2_kernel_size": conv2_kernel_size,
+    "conv2_padding": conv2_padding,
+    "conv3_out_channels": conv3_out_channels,
+    "conv3_kernel_size": conv3_kernel_size,
+    "conv3_padding": conv3_padding,
+    "batch_size": batch_size,
+    "fc1_units": fc1_units,
+    "batch_norm": True,        # Batch Normalization On/Off
+    "lr": lr,
+    "NUM_EPOCHS": NUM_EPOCHS,
+    "scheduler": False,        # Scheduler On/Off
+    "weight_decay": False      # Weight_decay On/Off
+}
+    run = wandb.init(project="CMPM17_FINAL", name="Epoch 30 again", config=config)
+
+    print("Configured hyperparameters: ")
+    print(wandb.config)
 
     # IMAGE TRANSFORMATIONS - Increases model robustness
     train_transforms = v2.Compose([
@@ -121,7 +163,7 @@ def main():
 
     # DATASETS + DATALOADERS
     train_dataset = CNN_Dataset("dataset/train", train_transforms)
-    train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
     test_dataset = CNN_Dataset("dataset/test", test_transforms)
 
@@ -135,8 +177,8 @@ def main():
     validation_dataset = Subset(test_dataset, validation_indices)
     test_dataset = Subset(test_dataset, test_indices)
 
-    validation_dataloader = DataLoader(validation_dataset, batch_size=32, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
+    validation_dataloader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=True)
+    test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
     # INITIALIZATIONS
     model = CNN_Main().to(device)
@@ -147,11 +189,8 @@ def main():
     # Essentially, the model will start around 1.79 loss and should slowly go down from there
     loss_function = nn.CrossEntropyLoss()
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=0.01) ###
-    scheduler = ExpLR(optimizer, gamma=0.9)
-
-    ###
-    NUM_EPOCHS = 30
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr) #weight_decay=0.01) ###
+    #scheduler = ExpLR(optimizer, gamma=0.9)
 
     # TRAINING LOOP
     for epoch in range(NUM_EPOCHS):
@@ -186,7 +225,7 @@ def main():
             loss.backward()       # Calculates function slope
             optimizer.step()      # Updates model parameters
             optimizer.zero_grad() # Resets optimizer to be ready for next epoch
-            scheduler.step()
+            #scheduler.step()  # epoch 인자 없이 호출
 
             # Saving learning metrics in each batches on wandb
             run.log({"train_batch_losses": loss.item()})
@@ -221,7 +260,7 @@ def main():
 
                 # Saving learning metrics in each batches on wandb
                 run.log({"val_batch_losses": loss.item()})
-        
+    
     # Average loss and accuracy calculation after one epoch on training
     avg_loss_epoch = total_loss_epoch / total_pred
     avg_accuracy_epoch = correct_pred / total_pred
@@ -237,6 +276,18 @@ def main():
 
     # Saving validation metrics on wandb
     run.log({"avg_val_loss": avg_val_loss, "avg_val_accuracy": accuracy_val})
+
+    # === Saving Model ===
+    model_save_path = "cnn_model.pt"
+    torch.save(model.state_dict(), model_save_path)
+    print(f"Model saved to {model_save_path}")
+
+    # === Loading Model ===
+    # Load the saved state dict after creating new model instance
+    loaded_model = CNN_Main().to(device)
+    loaded_model.load_state_dict(torch.load(model_save_path))
+    loaded_model.eval()  # Converting the mode to evaluation
+    print(f"Model loaded from {model_save_path}")
     
     # TESTING LOOP
     # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
