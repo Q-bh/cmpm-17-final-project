@@ -13,6 +13,7 @@ from torch.utils.data import Dataset, DataLoader, Subset
 import torchvision.datasets as datasets
 from torchvision.transforms import v2
 import wandb
+import torch.optim.lr_scheduler.ExponentialLR as ExpLR
 
 # CLASSES
 
@@ -30,10 +31,7 @@ class CNN_Dataset(Dataset):
 
 # Linear Neural Network
 class CNN_Main(nn.Module):
-    def __init__(self, num_classes = 6, dropout_rate=0.5, conv1_channels=16, conv2_channels=32,
-                fc1_units=128, conv1_kernel_size = 3, conv1_padding_size = 1, activation=nn.ReLU(),
-                pool_kernel_size=2, pool_stride_size=2, conv2_kernel_size = 3, conv2_padding_size = 1,
-                conv3_channels=64, conv3_kernel_size=3, conv3_padding_size=1):
+    def __init__(self, num_classes = 6, dropout_rate=0.5, fc1_units=128):
         super().__init__()
 
         # Two convolutional layers to avoid overfitting.
@@ -42,19 +40,19 @@ class CNN_Main(nn.Module):
         # First convolution:
         # Input: (batch_size, 1, 128, 128)
         # conv1: (batch_size, 16, 128, 128) [kernel_size = 3, padding = 1]
-        self.conv1 = nn.Conv2d(in_channels = 1, out_channels = conv1_channels, kernel_size = conv1_kernel_size, padding = conv1_padding_size)
-        self.bn1 = nn.BatchNorm2d(conv1_channels) # Batch normalization, output channel is 16
-        self.pool = nn.MaxPool2d(kernel_size = pool_kernel_size, stride = pool_stride_size) # Make the image as a half size (64)
+        self.conv1 = nn.Conv2d(in_channels = 1, out_channels = 16, kernel_size = 3, padding = 1)
+        self.bn1 = nn.BatchNorm2d(16) # Batch normalization, output channel is 16
+        self.pool = nn.MaxPool2d(kernel_size = 2, stride = 2) # Make the image as a half size (64)
 
         # Second convolution: Input channel = 16 -> Output Channel = 32
         # Input: (batch_size, 16, 64, 64)
         # conv2: (batch_size, 32, 64, 64) [kernel_size = 3, padding = 1]
-        self.conv2 = nn.Conv2d(in_channels = conv1_channels, out_channels = conv2_channels, kernel_size = conv2_kernel_size, padding = conv2_padding_size)
-        self.bn2 = nn.BatchNorm2d(conv2_channels) # Batch normalization, output channel is 32
+        self.conv2 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3, padding = 1)
+        self.bn2 = nn.BatchNorm2d(32) # Batch normalization, output channel is 32
 
-        self.conv3 = nn.Conv2d(in_channels=conv2_channels, out_channels=conv3_channels, kernel_size=conv3_kernel_size, padding=conv3_padding_size)
-        self.bn3 = nn.BatchNorm2d(conv3_channels)
-        self.relu = activation # Adding a non-linearity
+        self.conv3 = nn.Conv2d(in_channels = 32, out_channels = 64, kernel_size = 3, padding = 1)
+        self.bn3 = nn.BatchNorm2d(64)
+        self.relu = nn.ReLU()
 
         # Dropout layer
         self.dropout = nn.Dropout(dropout_rate)
@@ -63,7 +61,7 @@ class CNN_Main(nn.Module):
         # Final feature map: (batch_size, 64, 16, 16)
         # Flatten = 32 * 32 * 32 
 
-        self.fc1 = nn.Linear(conv3_channels * 16 * 16, fc1_units) # 16, 16 are when pool kernel = 2, pool stride = 2
+        self.fc1 = nn.Linear(64 * 16 * 16, fc1_units) # 16, 16 are when pool kernel = 2, pool stride = 2
         self.fc2 = nn.Linear(fc1_units, num_classes)
 
     def forward(self, input):
@@ -104,9 +102,9 @@ def main():
 
     # IMAGE TRANSFORMATIONS - Increases model robustness
     train_transforms = v2.Compose([
-        v2.Resize((128, 128)),     # Resizes image to 128x128; Original data is 48x48
         v2.RandomHorizontalFlip(), # Flips images horizontally with 50% probability
         v2.RandomRotation(30),     # Rotation on images up to 30 degrees
+        v2.Resize((128, 128)),     # Resizes image to 128x128; Original data is 48x48
         v2.Grayscale(1),           # Images are grayscale already, but this properly makes the tensors 1 channel
         #v2.Lambda(add_noise),     # Adding noise, depending on the model performance
         v2.ToTensor(),
@@ -149,10 +147,11 @@ def main():
     # Essentially, the model will start around 1.79 loss and should slowly go down from there
     loss_function = nn.CrossEntropyLoss()
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001) ###
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=0.01) ###
+    scheduler = ExpLR(optimizer, gamma=0.9)
 
     ###
-    NUM_EPOCHS = 20
+    NUM_EPOCHS = 30
 
     # TRAINING LOOP
     for epoch in range(NUM_EPOCHS):
@@ -187,6 +186,7 @@ def main():
             loss.backward()       # Calculates function slope
             optimizer.step()      # Updates model parameters
             optimizer.zero_grad() # Resets optimizer to be ready for next epoch
+            scheduler.step()
 
             # Saving learning metrics in each batches on wandb
             run.log({"train_batch_losses": loss.item()})
