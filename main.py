@@ -32,7 +32,8 @@ class CNN_Dataset(Dataset):
 class CNN_Main(nn.Module):
     def __init__(self, num_classes = 6, dropout_rate=0.5, conv1_channels=16, conv2_channels=32,
                 fc1_units=128, conv1_kernel_size = 3, conv1_padding_size = 1, activation=nn.ReLU(),
-                pool_kernel_size=2, pool_stride_size=2, conv2_kernel_size = 3, conv2_padding_size = 1):
+                pool_kernel_size=2, pool_stride_size=2, conv2_kernel_size = 3, conv2_padding_size = 1,
+                conv3_channels=64, conv3_kernel_size=3, conv3_padding_size=1):
         super().__init__()
 
         # Two convolutional layers to avoid overfitting.
@@ -49,17 +50,20 @@ class CNN_Main(nn.Module):
         # Input: (batch_size, 16, 64, 64)
         # conv2: (batch_size, 32, 64, 64) [kernel_size = 3, padding = 1]
         self.conv2 = nn.Conv2d(in_channels = conv1_channels, out_channels = conv2_channels, kernel_size = conv2_kernel_size, padding = conv2_padding_size)
-        self.bn2 = nn.BatchNorm2d(32) # Batch normalization, output channel is 32
+        self.bn2 = nn.BatchNorm2d(conv2_channels) # Batch normalization, output channel is 32
+
+        self.conv3 = nn.Conv2d(in_channels=conv2_channels, out_channels=conv3_channels, kernel_size=conv3_kernel_size, padding=conv3_padding_size)
+        self.bn3 = nn.BatchNorm2d(conv3_channels)
         self.relu = activation # Adding a non-linearity
 
         # Dropout layer
         self.dropout = nn.Dropout(dropout_rate)
     
-        # After two poolings, image size is 128 -> 64 -> 32
-        # Final feature map: (batch_size, 32, 32, 32)
-        # Flatten = 32 * 32 * 32 = 32786 dimensions
+        # After three poolings, image size is 128 -> 64 -> 32 -> 16
+        # Final feature map: (batch_size, 64, 16, 16)
+        # Flatten = 32 * 32 * 32 
 
-        self.fc1 = nn.Linear(conv2_channels * 32 * 32, fc1_units) # 32, 32 are when pool kernel = 2, pool stride = 2
+        self.fc1 = nn.Linear(conv3_channels * 16 * 16, fc1_units) # 16, 16 are when pool kernel = 2, pool stride = 2
         self.fc2 = nn.Linear(fc1_units, num_classes)
 
     def forward(self, input):
@@ -67,12 +71,17 @@ class CNN_Main(nn.Module):
         # The original data is 48*48, but we transform the image size to 128*128
 
         x = self.conv1(input)
-        x = self.bn1(x)
+        #x = self.bn1(x)
         x = self.relu(x)
         x = self.pool(x)
         
         x = self.conv2(x)
-        x = self.bn2(x)
+        #x = self.bn2(x)
+        x = self.relu(x)
+        x = self.pool(x)
+
+        x = self.conv3(x)
+        #x = self.bn3(x)
         x = self.relu(x)
         x = self.pool(x)
 
@@ -80,22 +89,18 @@ class CNN_Main(nn.Module):
 
         x = self.fc1(x)
         x = self.relu(x)
-        #x = self.dropout(x)
+        x = self.dropout(x)
         x = self.fc2(x)
 
         return x
 
 def main(): 
     # DEVICE SELECTION
-    if torch.cuda.is_available():
-        device = 'cuda'
-        print('CUDA is available. Using GPU.')
-    else:
-        device = 'cpu'
-        print('CUDA is not available. Using CPU.')
+    device = "cuda" if torch.cuda.is_available() else 'cpu'
+    print(f"Using device: {device}")
 
     # wandb initialization: Saving the name of run and project
-    run = wandb.init(project="CMPM17_FINAL", name="March 13")
+    run = wandb.init(project="CMPM17_FINAL", name="March 14, epoch 20, conv3")
 
     # IMAGE TRANSFORMATIONS - Increases model robustness
     train_transforms = v2.Compose([
@@ -147,7 +152,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001) ###
 
     ###
-    NUM_EPOCHS = 1
+    NUM_EPOCHS = 20
 
     # TRAINING LOOP
     for epoch in range(NUM_EPOCHS):
@@ -231,7 +236,7 @@ def main():
     print(f"Epoch {epoch+1} - Validation Average Loss: {avg_val_loss:.4f}, Accuracy: {accuracy_val:.4f}\n")
 
     # Saving validation metrics on wandb
-    run.log({"abg_val_loss": avg_val_loss, "avg_val_accuracy": accuracy_val})
+    run.log({"avg_val_loss": avg_val_loss, "avg_val_accuracy": accuracy_val})
     
     # TESTING LOOP
     # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
