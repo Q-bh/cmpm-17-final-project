@@ -147,7 +147,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001) ###
 
     ###
-    NUM_EPOCHS = 30
+    NUM_EPOCHS = 1
 
     # TRAINING LOOP
     for epoch in range(NUM_EPOCHS):
