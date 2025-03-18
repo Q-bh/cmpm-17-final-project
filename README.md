@@ -27,3 +27,8 @@ While there is no significant difference between the train and test datasets in 
 This means that if we were to use a simple majority classifier, always predicting the happy class, we would achieve 25% accuracy. With this in mind, we set our initial target accuracy at 40%, aiming for a 15 percentage point improvement over the baseline.
 
 However, this is only an initial goal. Through continuous improvements and model optimization, our final objective is to achieve an accuracy of at least 60%.
+
+### How to use
+
+1. Quick file version: Run demo.py on a terminal in your local computer.
+2. Website version: Run web_demo.py to get a better user experience.
