@@ -1,19 +1,9 @@
-# Excess libraries are included in case they are needed
-# They will be removed by the final project's completion if they remain unused
-import time
-import random
-import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-from PIL import Image
-from sklearn.preprocessing import StandardScaler
 import torch, torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, Subset
 import torchvision.datasets as datasets
 from torchvision.transforms import v2
 import wandb
-from torch.optim.lr_scheduler import ExponentialLR as ExpLR
 
 
 # Hyperparameters
@@ -122,7 +112,7 @@ class CNN_Main(nn.Module):
         x = x.flatten(start_dim=1)
         x = self.fc1(x)
         x = self.relu(x)
-        #x = self.dropout(x)
+
         x = self.fc2(x)
         x = self.relu(x)
         x = self.fc3(x)
@@ -135,27 +125,27 @@ def main():
 
     # wandb initialization: Saving the name of run and project
     config = {
-    "dropout_rate": dropout_rate,
-    "conv1_out_channels": conv1_out_channels,
-    "conv1_kernel_size": conv1_kernel_size,
-    "conv1_padding": conv1_padding,
-    "conv2_out_channels": conv2_out_channels,
-    "conv2_kernel_size": conv2_kernel_size,
-    "conv2_padding": conv2_padding,
-    "conv3_out_channels": conv3_out_channels,
-    "conv3_kernel_size": conv3_kernel_size,
-    "conv3_padding": conv3_padding,
-    "conv4_out_channels": conv4_out_channels,
-    "conv4_kernel_size": conv4_kernel_size,
-    "conv4_padding" : conv4_padding,
-    "batch_size": batch_size,
-    "fc1_units": fc1_units,
-    "batch_norm": True,        # Batch Normalization On/Off
-    "lr": lr,
-    "NUM_EPOCHS": NUM_EPOCHS,
-    "scheduler": False,        # Scheduler On/Off
-    "weight_decay": False      # Weight_decay On/Off
-}
+        "dropout_rate": dropout_rate,
+        "conv1_out_channels": conv1_out_channels,
+        "conv1_kernel_size": conv1_kernel_size,
+        "conv1_padding": conv1_padding,
+        "conv2_out_channels": conv2_out_channels,
+        "conv2_kernel_size": conv2_kernel_size,
+        "conv2_padding": conv2_padding,
+        "conv3_out_channels": conv3_out_channels,
+        "conv3_kernel_size": conv3_kernel_size,
+        "conv3_padding": conv3_padding,
+        "conv4_out_channels": conv4_out_channels,
+        "conv4_kernel_size": conv4_kernel_size,
+        "conv4_padding" : conv4_padding,
+        "batch_size": batch_size,
+        "fc1_units": fc1_units,
+        "batch_norm": True,        # Batch Normalization On/Off
+        "lr": lr,
+        "NUM_EPOCHS": NUM_EPOCHS,
+        "scheduler": False,        # Scheduler On/Off
+        "weight_decay": False      # Weight_decay On/Off
+    }
     run = wandb.init(project="CMPM17_FINAL", name="Epoch 30 lr 0.001 3fc conv4 cpu", config=config)
 
     print("Configured hyperparameters: ")
@@ -167,7 +157,6 @@ def main():
         v2.RandomRotation(30),     # Rotation on images up to 30 degrees
         v2.Resize((128, 128)),     # Resizes image to 128x128; Original data is 48x48
         v2.Grayscale(1),           # Images are grayscale already, but this properly makes the tensors 1 channel
-        #v2.Lambda(add_noise),     # Adding noise, depending on the model performance
         v2.ToTensor(),
         v2.Normalize([0.5], [0.5]) # Normalization
     ])
@@ -310,7 +299,6 @@ def main():
     # print(f"Model loaded from {model_save_path}")
     
     # TESTING LOOP
-    # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
     model.eval()
     total_loss_test = 0.0
     correct_test = 0
