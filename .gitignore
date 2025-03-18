@@ -1,4 +1,4 @@
 dataset/
-____pycache__
+__pycache__
 .gradio
 wandb
