@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: t1t2
+spec:
+  containers:
+    - name: t1t2
+      image: ubuntu
+      resources:
+        limits:
+          memory: 32Gi
+          cpu: 4
+          nvidia.com/gpu: 1
+        requests:
+          memory: 16Gi
+          cpu: 2
+          nvidia.com/gpu: 1
+      command: ['sh', '-c', 'sleep infinity']
+      volumeMounts:
+        - mountPath: /pvc-files
+          name: pvc-files
+        - mountPath: /pvc-files2
+          name: pvc-files2
+  volumes:
+    - name: pvc-files
+      persistentVolumeClaim:
+        claimName: ml-pvc
+    - name: pvc-files2
+      persistentVolumeClaim:
+        claimName: ml-pvc2
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: nvidia.com/gpu.product
+                operator: In
+                values:
+                  - NVIDIA-GeForce-RTX-3090

@@ -26,6 +26,7 @@ fc2_units = 128
 batch_norm = True   # Batch Normalization On/Off
 lr = 0.001
 NUM_EPOCHS = 30
+dropout = False # Dropout On/Off
 scheduler = False   # Scheduler On/Off
 weight_decay = False    # Weight_decay On/Off
 
@@ -71,7 +72,7 @@ class CNN_Main(nn.Module):
                             kernel_size=conv3_kernel_size, padding=conv3_padding)
         self.bn3 = nn.BatchNorm2d(conv3_out_channels)
 
-        # Fourth convolution (추가):
+        # Fourth convolution (Added):
         # Input: (batch_size, conv3_out_channels, 16, 16)
         # conv4: (batch_size, conv4_out_channels, 16, 16)
         self.conv4 = nn.Conv2d(in_channels=conv3_out_channels, out_channels=conv4_out_channels, 
@@ -233,7 +234,7 @@ def main():
             loss.backward()       # Calculates function slope
             optimizer.step()      # Updates model parameters
             optimizer.zero_grad() # Resets optimizer to be ready for next epoch
-            #scheduler.step()  # epoch 인자 없이 호출
+            #scheduler.step()  # With no parameter
 
             # Saving learning metrics in each batches on wandb
             run.log({"train_batch_losses": loss.item()})
