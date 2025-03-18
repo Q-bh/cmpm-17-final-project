@@ -30,7 +30,7 @@ image_tensor = transforms(image).unsqueeze(0)
 with torch.no_grad():
     pred = loaded_model(image_tensor)
     confidences = torch.softmax(pred, dim=1)
-    confidence, predicted_class = torch.max(confidences, dim=1)
+    main_confidence, main_predicted_class = torch.max(confidences, dim=1)
 
 emotions_list = ["anger", "fear", "happy", "neutral", "sad", "surprise"]
 
@@ -46,4 +46,4 @@ neutral: {confidence_list[3]:.2f}%
 sad: {confidence_list[4]:.2f}%
 surprise: {confidence_list[5]:.2f}%
 """)
-print(f"Predicted class: {emotions_list[predicted_class.item()]}, Confidence: {confidence.item() * 100:.2f}%")
+print(f"Predicted class: {emotions_list[main_predicted_class.item()]}, Confidence: {main_confidence.item() * 100:.2f}%")
