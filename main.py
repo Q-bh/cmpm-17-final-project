@@ -17,7 +17,7 @@ from torch.optim.lr_scheduler import ExponentialLR as ExpLR
 
 
 # Hyperparameters
-dropout_rate = 0.5
+dropout_rate = 0.2
 conv1_out_channels = 16
 conv1_kernel_size = 3
 conv1_padding = 1
@@ -27,13 +27,18 @@ conv2_padding = 1
 conv3_out_channels = 64
 conv3_kernel_size = 3
 conv3_padding = 1
+conv4_out_channels = 128
+conv4_kernel_size = 3
+conv4_padding = 1
 batch_size = 32
-fc1_units = 128
-batch_norm = False   # Batch Normalization On/Off
+fc1_units = 256
+fc2_units = 128
+batch_norm = True   # Batch Normalization On/Off
 lr = 0.001
 NUM_EPOCHS = 30
 scheduler = False   # Scheduler On/Off
 weight_decay = False    # Weight_decay On/Off
+
 
 # CLASSES
 
@@ -51,65 +56,76 @@ class CNN_Dataset(Dataset):
 
 # Linear Neural Network
 class CNN_Main(nn.Module):
-    def __init__(self, num_classes = 6):
+    def __init__(self, num_classes=6):
         super().__init__()
-
-        # Two convolutional layers to avoid overfitting.
-        # More layers can be added depending on the performance.
 
         # First convolution:
         # Input: (batch_size, 1, 128, 128)
-        # conv1: (batch_size, 16, 128, 128) [kernel_size = 3, padding = 1]
-        self.conv1 = nn.Conv2d(in_channels = 1, out_channels = conv1_out_channels, kernel_size = conv1_kernel_size, padding = conv2_kernel_size)
-        self.bn1 = nn.BatchNorm2d(conv1_out_channels) # Batch normalization, output channel is 16
-        self.pool = nn.MaxPool2d(kernel_size = 2, stride = 2) # Make the image as a half size (64)
+        # conv1: (batch_size, conv1_out_channels, 128, 128)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=conv1_out_channels, 
+                            kernel_size=conv1_kernel_size, padding=conv2_kernel_size)
+        self.bn1 = nn.BatchNorm2d(conv1_out_channels)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        # Second convolution: Input channel = 16 -> Output Channel = 32
-        # Input: (batch_size, 16, 64, 64)
-        # conv2: (batch_size, 32, 64, 64) [kernel_size = 3, padding = 1]
-        self.conv2 = nn.Conv2d(in_channels = conv1_out_channels, out_channels = conv2_out_channels, kernel_size = conv2_kernel_size, padding = conv2_padding)
-        self.bn2 = nn.BatchNorm2d(conv2_out_channels) # Batch normalization, output channel is 32
+        # Second convolution:
+        # Input: (batch_size, conv1_out_channels, 64, 64)
+        # conv2: (batch_size, conv2_out_channels, 64, 64)
+        self.conv2 = nn.Conv2d(in_channels=conv1_out_channels, out_channels=conv2_out_channels, 
+                            kernel_size=conv2_kernel_size, padding=conv2_padding)
+        self.bn2 = nn.BatchNorm2d(conv2_out_channels)
 
-        self.conv3 = nn.Conv2d(in_channels = conv2_out_channels, out_channels = conv3_out_channels, kernel_size = conv3_kernel_size, padding = conv3_padding)
+        # Third convolution:
+        # Input: (batch_size, conv2_out_channels, 32, 32)
+        # conv3: (batch_size, conv3_out_channels, 32, 32)
+        self.conv3 = nn.Conv2d(in_channels=conv2_out_channels, out_channels=conv3_out_channels, 
+                            kernel_size=conv3_kernel_size, padding=conv3_padding)
         self.bn3 = nn.BatchNorm2d(conv3_out_channels)
+
+        # Fourth convolution (추가):
+        # Input: (batch_size, conv3_out_channels, 16, 16)
+        # conv4: (batch_size, conv4_out_channels, 16, 16)
+        self.conv4 = nn.Conv2d(in_channels=conv3_out_channels, out_channels=conv4_out_channels, 
+                            kernel_size=conv4_kernel_size, padding=conv4_padding)
+        self.bn4 = nn.BatchNorm2d(conv4_out_channels)
+
         self.relu = nn.ReLU()
-
-        # Dropout layer
         self.dropout = nn.Dropout(dropout_rate)
-    
-        # After three poolings, image size is 128 -> 64 -> 32 -> 16
-        # Final feature map: (batch_size, 64, 16, 16)
-        # Flatten = 32 * 32 * 32 
 
-        self.fc1 = nn.Linear(conv3_out_channels * 16 * 16, fc1_units) # 16, 16 are when pool kernel = 2, pool stride = 2
-        self.fc2 = nn.Linear(fc1_units, num_classes)
+        # After 4 poolings, image size: 128 -> 64 -> 32 -> 16 -> 8
+        # fc1 입력 크기: conv4_out_channels * 8 * 8
+        self.fc1 = nn.Linear(conv4_out_channels * 8 * 8, fc1_units)
+        self.fc2 = nn.Linear(fc1_units, fc2_units)
+        self.fc3 = nn.Linear(fc2_units, num_classes)
 
     def forward(self, input):
         # Input: (batch_size, 1, 128, 128)
-        # The original data is 48*48, but we transform the image size to 128*128
-
         x = self.conv1(input)
-        #x = self.bn1(x)
+        x = self.bn1(x)
         x = self.relu(x)
         x = self.pool(x)
         
         x = self.conv2(x)
-        #x = self.bn2(x)
+        x = self.bn2(x)
         x = self.relu(x)
         x = self.pool(x)
 
         x = self.conv3(x)
-        #x = self.bn3(x)
+        x = self.bn3(x)
         x = self.relu(x)
         x = self.pool(x)
 
-        x = x.flatten(start_dim = 1)
+        x = self.conv4(x)
+        x = self.bn4(x)
+        x = self.relu(x)
+        x = self.pool(x)
 
+        x = x.flatten(start_dim=1)
         x = self.fc1(x)
         x = self.relu(x)
         #x = self.dropout(x)
         x = self.fc2(x)
-
+        x = self.relu(x)
+        x = self.fc3(x)
         return x
 
 def main(): 
@@ -129,6 +145,9 @@ def main():
     "conv3_out_channels": conv3_out_channels,
     "conv3_kernel_size": conv3_kernel_size,
     "conv3_padding": conv3_padding,
+    "conv4_out_channels": conv4_out_channels,
+    "conv4_kernel_size": conv4_kernel_size,
+    "conv4_padding" : conv4_padding,
     "batch_size": batch_size,
     "fc1_units": fc1_units,
     "batch_norm": True,        # Batch Normalization On/Off
@@ -137,7 +156,7 @@ def main():
     "scheduler": False,        # Scheduler On/Off
     "weight_decay": False      # Weight_decay On/Off
 }
-    run = wandb.init(project="CMPM17_FINAL", name="Epoch 30 again", config=config)
+    run = wandb.init(project="CMPM17_FINAL", name="Epoch 30 lr 0.001 3fc conv4 cpu", config=config)
 
     print("Configured hyperparameters: ")
     print(wandb.config)
@@ -234,6 +253,7 @@ def main():
             print(f"Batch Loss: {loss.item():.4f}")
             print(f"Predicted: {predictions}")
             print(f"Confidences: {max_confidences}\n")
+            print(f"Epoch: {epoch}")
         
         # VALIDATION LOOP
         model.eval()
@@ -282,47 +302,47 @@ def main():
     torch.save(model.state_dict(), model_save_path)
     print(f"Model saved to {model_save_path}")
 
-    # === Loading Model ===
-    # Load the saved state dict after creating new model instance
-    loaded_model = CNN_Main().to(device)
-    loaded_model.load_state_dict(torch.load(model_save_path))
-    loaded_model.eval()  # Converting the mode to evaluation
-    print(f"Model loaded from {model_save_path}")
+    # # === Loading Model ===
+    # # Load the saved state dict after creating new model instance
+    # loaded_model = CNN_Main().to(device)
+    # loaded_model.load_state_dict(torch.load(model_save_path))
+    # loaded_model.eval()  # Converting the mode to evaluation
+    # print(f"Model loaded from {model_save_path}")
     
     # TESTING LOOP
     # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
-    # model.eval()
-    # total_loss_test = 0.0
-    # correct_test = 0
-    # total_test = 0
+    model.eval()
+    total_loss_test = 0.0
+    correct_test = 0
+    total_test = 0
 
-    # with torch.no_grad():
-    #       for image, label in test_dataloader:
+    with torch.no_grad():
+        for image, label in test_dataloader:
 
-    #       image = image.to(device)
-    #       label = label.to(device)
-    #         # PREDICT
-    #         pred = model(image)
+            image = image.to(device)
+            label = label.to(device)
+            # PREDICT
+            pred = model(image)
 
-    #         # SCORE
-    #         loss = loss_function(pred, label)
-    #         total_loss_test += loss.item() * image.size(0)
-    #         total_test += label.size()
+            # SCORE
+            loss = loss_function(pred, label)
+            total_loss_test += loss.item() * image.size(0)
+            total_test += label.size(0)
 
-    #         confidences = torch.softmax(pred, dim = 1)
-    #         max_confidences, predictions = torch.max(confidences, dim = 1)
-    #         correct_test += (predictions == label).sum().item()
+            confidences = torch.softmax(pred, dim = 1)
+            max_confidences, predictions = torch.max(confidences, dim = 1)
+            correct_test += (predictions == label).sum().item()
     
-    #         Saving learning metrics in each batches on wandb
-    #         run.log({"test_batch_loss": loss.item()})
+            # Saving learning metrics in each batches on wandb
+            run.log({"test_batch_loss": loss.item()})
 
-    # avg_loss_test = total_loss_test / total_test
-    # accuracy_test = correct_test / total_test
+    avg_loss_test = total_loss_test / total_test
+    accuracy_test = correct_test / total_test
 
-    # print(f"Test Set - Average Loss: {avg_loss_test:.4f}, Accuracy: {accuracy_test:.4f}")
+    print(f"Test Set - Average Loss: {avg_loss_test:.4f}, Accuracy: {accuracy_test:.4f}")
 
     # Saving test metrics on wandb as well
-    # run.log({"test_loss": avg_loss_test, "test_accuracy": accuracy_test})
+    run.log({"test_loss": avg_loss_test, "test_accuracy": accuracy_test})
 
     run.finish() # wandb run execution
 
