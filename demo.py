@@ -1,5 +1,3 @@
-# Excess libraries are included in case they are needed
-# They will be removed by the final project's completion if they remain unused
 from PIL import Image
 import torch
 from torchvision.transforms import v2
