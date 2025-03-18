@@ -1,6 +1,6 @@
 # CMPM 17 Final Project
 
-Created by Liam Youm(https://github.com/Liamtsy) & Kevin Nguyen(https://github.com/Q-bh).
+Created by [Liam Youm](https://github.com/Liamtsy) & [Kevin Nguyen](https://github.com/Q-bh).
 
 ## Brief
 
