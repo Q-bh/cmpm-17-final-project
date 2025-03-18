@@ -16,7 +16,7 @@ The dataset is split into two main subsets: a training set and a test set. Both 
 
 ### Model Architecture
 
-Our model will be a CNN. We already have roughly over 32,000 images as inputs and outputs with a likelihood of the class that the image would belong to. The specific model architecture is TBD, and needs to be addressed on later milestones.
+Our model uses the structure of a convolutional neural network. We already have roughly over 32,000 images as inputs and outputs with a likelihood of the class that the image would belong to. The specific model architecture can be seen in `main.py`.
 
 ### Accuracy Prediction
 
@@ -32,7 +32,7 @@ However, this is only an initial goal. Through continuous improvements and model
 
 Accuracy: approximately 60%
 
-### How to use
+### How to Use
 
 1. Quick file version: Run demo.py on a terminal in your local computer.
 2. Website version: Run web_demo.py to get a better user experience.
