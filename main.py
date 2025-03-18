@@ -100,7 +100,7 @@ class CNN_Main(nn.Module):
     def forward(self, input):
         # Input: (batch_size, 1, 128, 128)
         x = self.conv1(input)
-        #x = self.bn1(x)
+        x = self.bn1(x)
         x = self.relu(x)
         x = self.pool(x)
         
