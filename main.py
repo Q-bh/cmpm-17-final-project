@@ -26,6 +26,7 @@ fc2_units = 128
 batch_norm = True   # Batch Normalization On/Off
 lr = 0.001
 NUM_EPOCHS = 30
+dropout = False # Dropout On/Off
 scheduler = False   # Scheduler On/Off
 weight_decay = False    # Weight_decay On/Off
 
