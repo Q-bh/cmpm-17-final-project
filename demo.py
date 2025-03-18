@@ -19,7 +19,7 @@ transforms = v2.Compose([
     ])
 
 # CHANGE FILE NAME HERE: "./demo/The_<EMOTION>_Rock.png"
-image_path = "./demo/The_Happy_Rock.png"
+image_path = "./demo/satoshi.jpeg"
 
 image = Image.open(image_path)
 
