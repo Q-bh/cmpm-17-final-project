@@ -81,7 +81,7 @@ class CNN_Main(nn.Module):
                             kernel_size=conv3_kernel_size, padding=conv3_padding)
         self.bn3 = nn.BatchNorm2d(conv3_out_channels)
 
-        # Fourth convolution (추가):
+        # Fourth convolution (Final addition):
         # Input: (batch_size, conv3_out_channels, 16, 16)
         # conv4: (batch_size, conv4_out_channels, 16, 16)
         self.conv4 = nn.Conv2d(in_channels=conv3_out_channels, out_channels=conv4_out_channels, 
@@ -92,7 +92,7 @@ class CNN_Main(nn.Module):
         self.dropout = nn.Dropout(dropout_rate)
 
         # After 4 poolings, image size: 128 -> 64 -> 32 -> 16 -> 8
-        # fc1 입력 크기: conv4_out_channels * 8 * 8
+        # fc1 input size: conv4_out_channels * 8 * 8
         self.fc1 = nn.Linear(conv4_out_channels * 8 * 8, fc1_units)
         self.fc2 = nn.Linear(fc1_units, fc2_units)
         self.fc3 = nn.Linear(fc2_units, num_classes)
@@ -310,7 +310,6 @@ def main():
     # print(f"Model loaded from {model_save_path}")
     
     # TESTING LOOP
-    # We commented the test loop because we don't want to run it until we ACTUALLY want to test the model.
     model.eval()
     total_loss_test = 0.0
     correct_test = 0
