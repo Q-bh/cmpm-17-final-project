@@ -28,6 +28,10 @@ This means that if we were to use a simple majority classifier, always predictin
 
 However, this is only an initial goal. Through continuous improvements and model optimization, our final objective is to achieve an accuracy of at least 60%.
 
+### Current Accuracy
+
+Accuracy: approximately 60%
+
 ### How to use
 
 1. Quick file version: Run demo.py on a terminal in your local computer.
