@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cni.projectcalico.org/containerID: 5fd5b9303b5c9ef7c8e2df33257f738101766cca984ce09d205927e37c6dfe52
+    cni.projectcalico.org/podIP: 10.244.71.244/32
+    cni.projectcalico.org/podIPs: 10.244.71.244/32,fdf0:17b3:c3ec:1f79:10:0:3:60c6/128
+  creationTimestamp: '2025-03-12T18:08:46Z'
+  name: pod-liam
+  namespace: anthony-lab
+  resourceVersion: '9826273723'
+  uid: 901cd790-882a-4295-864a-b0308204a491
+spec:
+  activeDeadlineSeconds: 21600
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: nvidia.com/gpu.product
+                operator: In
+                values:
+                  - NVIDIA-GeForce-RTX-3090
+  containers:
+    - command:
+        - sh
+        - -c
+        - sleep infinity
+      image: ubuntu
+      imagePullPolicy: Always
+      name: pod-liam
+      resources:
+        limits:
+          cpu: '4'
+          memory: 32Gi
+          nvidia.com/gpu: '1'
+        requests:
+          cpu: '2'
+          memory: 16Gi
+          nvidia.com/gpu: '1'
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+        - mountPath: /pvc-files/
+          name: pvc-files
+        - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          name: kube-api-access-7nqdj
+          readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: gpu-02.csusb.edu
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: PreferNoSchedule
+      key: nvidia.com/gpu
+      operator: Exists
+  volumes:
+    - name: pvc-files
+      persistentVolumeClaim:
+        claimName: ml-pvc
+    - name: kube-api-access-7nqdj
+      projected:
+        defaultMode: 420
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              items:
+                - key: ca.crt
+                  path: ca.crt
+              name: kube-root-ca.crt
+          - downwardAPI:
+              items:
+                - fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+                  path: namespace
+status:
+  conditions:
+    - lastProbeTime: null
+      lastTransitionTime: '2025-03-12T18:08:46Z'
+      status: 'True'
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: '2025-03-12T18:09:01Z'
+      status: 'True'
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: '2025-03-12T18:09:01Z'
+      status: 'True'
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: '2025-03-12T18:08:46Z'
+      status: 'True'
+      type: PodScheduled
+  containerStatuses:
+    - containerID: containerd://4e07c578744c2d37625629358d50a785553121caf6cf97bc328a6c09f57a0bd9
+      image: docker.io/library/ubuntu:latest
+      imageID: docker.io/library/ubuntu@sha256:72297848456d5d37d1262630108ab308d3e9ec7ed1c3286a32fe09856619a782
+      lastState: {}
+      name: pod-liam
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: '2025-03-12T18:09:00Z'
+  hostIP: 139.182.103.12
+  phase: Running
+  podIP: 10.244.71.244
+  podIPs:
+    - ip: 10.244.71.244
+    - ip: fdf0:17b3:c3ec:1f79:10:0:3:60c6
+  qosClass: Burstable
+  startTime: '2025-03-12T18:08:46Z'

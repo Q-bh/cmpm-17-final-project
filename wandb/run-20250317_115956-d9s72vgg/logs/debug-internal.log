@@ -1,0 +1,15 @@
+{"time":"2025-03-17T11:59:56.19159-07:00","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/Users/liamtsy/Desktop/Exchange_student/UCSC/Winter_2025/CMPM17-02/cmpm-17-final-project/wandb/run-20250317_115956-d9s72vgg/logs/debug-core.log"}
+{"time":"2025-03-17T11:59:56.30409-07:00","level":"INFO","msg":"created new stream","id":"d9s72vgg"}
+{"time":"2025-03-17T11:59:56.304139-07:00","level":"INFO","msg":"stream: started","id":"d9s72vgg"}
+{"time":"2025-03-17T11:59:56.304276-07:00","level":"INFO","msg":"writer: Do: started","stream_id":"d9s72vgg"}
+{"time":"2025-03-17T11:59:56.30431-07:00","level":"INFO","msg":"handler: started","stream_id":"d9s72vgg"}
+{"time":"2025-03-17T11:59:56.304455-07:00","level":"INFO","msg":"sender: started","stream_id":"d9s72vgg"}
+{"time":"2025-03-17T11:59:56.608808-07:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-03-17T11:59:57.852635-07:00","level":"INFO","msg":"stream: closing","id":"d9s72vgg"}
+{"time":"2025-03-17T11:59:57.852899-07:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-03-17T11:59:57.853372-07:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-03-17T11:59:58.291959-07:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-03-17T11:59:58.448828-07:00","level":"INFO","msg":"sender: closed","stream_id":"d9s72vgg"}
+{"time":"2025-03-17T11:59:58.448788-07:00","level":"INFO","msg":"writer: Close: closed","stream_id":"d9s72vgg"}
+{"time":"2025-03-17T11:59:58.449002-07:00","level":"INFO","msg":"handler: closed","stream_id":"d9s72vgg"}
+{"time":"2025-03-17T11:59:58.449119-07:00","level":"INFO","msg":"stream: closed","id":"d9s72vgg"}

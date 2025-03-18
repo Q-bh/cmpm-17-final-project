@@ -1,0 +1,44 @@
+{
+  "os": "macOS-15.3.1-arm64-arm-64bit",
+  "python": "CPython 3.10.4",
+  "startedAt": "2025-03-14T00:09:45.422540Z",
+  "program": "/Users/liamtsy/Desktop/Exchange_student/UCSC/Winter_2025/CMPM17-02/cmpm-17-final-project/main.py",
+  "codePath": "main.py",
+  "git": {
+    "remote": "https://github.com/Q-bh/cmpm-17-final-project.git",
+    "commit": "4cf0252a3dc35dc0ad6ecaffe077b0340c5867f5"
+  },
+  "email": "tyoum@ucsc.edu",
+  "root": "/Users/liamtsy/Desktop/Exchange_student/UCSC/Winter_2025/CMPM17-02/cmpm-17-final-project",
+  "host": "eduroam-169-233-194-232.ucsc.edu",
+  "executable": "/Users/liamtsy/cmpm17_venv/bin/python3",
+  "codePathLocal": "main.py",
+  "cpu_count": 8,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "245107195904",
+      "used": "221181194240"
+    },
+    "/System/Volumes/Data": {
+      "total": "245107195904",
+      "used": "221181194240"
+    }
+  },
+  "memory": {
+    "total": "8589934592"
+  },
+  "cpu": {
+    "count": 8,
+    "countLogical": 8
+  },
+  "apple": {
+    "name": "Apple M1",
+    "ecpuCores": 4,
+    "pcpuCores": 4,
+    "gpuCores": 7,
+    "memoryGb": 8,
+    "swapTotalBytes": "10737418240",
+    "ramTotalBytes": "8589934592"
+  }
+}

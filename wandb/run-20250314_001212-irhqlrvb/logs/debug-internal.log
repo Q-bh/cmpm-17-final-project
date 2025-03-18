@@ -1,0 +1,15 @@
+{"time":"2025-03-14T00:12:12.418744-07:00","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/Users/liamtsy/Desktop/Exchange_student/UCSC/Winter_2025/CMPM17-02/cmpm-17-final-project/wandb/run-20250314_001212-irhqlrvb/logs/debug-core.log"}
+{"time":"2025-03-14T00:12:12.530148-07:00","level":"INFO","msg":"created new stream","id":"irhqlrvb"}
+{"time":"2025-03-14T00:12:12.530483-07:00","level":"INFO","msg":"stream: started","id":"irhqlrvb"}
+{"time":"2025-03-14T00:12:12.530638-07:00","level":"INFO","msg":"writer: Do: started","stream_id":"irhqlrvb"}
+{"time":"2025-03-14T00:12:12.53065-07:00","level":"INFO","msg":"handler: started","stream_id":"irhqlrvb"}
+{"time":"2025-03-14T00:12:12.530807-07:00","level":"INFO","msg":"sender: started","stream_id":"irhqlrvb"}
+{"time":"2025-03-14T00:12:12.68786-07:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-03-14T00:12:13.964521-07:00","level":"INFO","msg":"stream: closing","id":"irhqlrvb"}
+{"time":"2025-03-14T00:12:13.96518-07:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-03-14T00:12:13.96567-07:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-03-14T00:12:14.396591-07:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-03-14T00:12:14.522894-07:00","level":"INFO","msg":"handler: closed","stream_id":"irhqlrvb"}
+{"time":"2025-03-14T00:12:14.522883-07:00","level":"INFO","msg":"writer: Close: closed","stream_id":"irhqlrvb"}
+{"time":"2025-03-14T00:12:14.522909-07:00","level":"INFO","msg":"sender: closed","stream_id":"irhqlrvb"}
+{"time":"2025-03-14T00:12:14.52303-07:00","level":"INFO","msg":"stream: closed","id":"irhqlrvb"}

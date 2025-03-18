@@ -1,0 +1,22 @@
+Configured hyperparameters:
+{'dropout_rate': 0.2, 'conv1_out_channels': 16, 'conv1_kernel_size': 3, 'conv1_padding': 1, 'conv2_out_channels': 32, 'conv2_kernel_size': 3, 'conv2_padding': 1, 'conv3_out_channels': 64, 'conv3_kernel_size': 3, 'conv3_padding': 1, 'conv4_out_channels': 128, 'conv4_kernel_size': 3, 'conv4_padding': 1, 'batch_size': 32, 'fc1_units': 128, 'batch_norm': True, 'lr': 0.001, 'NUM_EPOCHS': 30, 'scheduler': False, 'weight_decay': False}
+/Users/liamtsy/cmpm17_venv/lib/python3.10/site-packages/torchvision/transforms/v2/_deprecated.py:42: UserWarning: The transform `ToTensor()` is deprecated and will be removed in a future release. Instead, please use `v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)])`.Output is equivalent up to float precision.
+  warnings.warn(
+Traceback (most recent call last):
+  File "/Users/liamtsy/Desktop/Exchange_student/UCSC/Winter_2025/CMPM17-02/cmpm-17-final-project/main.py", line 346, in <module>
+    main()
+  File "/Users/liamtsy/Desktop/Exchange_student/UCSC/Winter_2025/CMPM17-02/cmpm-17-final-project/main.py", line 223, in main
+    pred = model(image)
+  File "/Users/liamtsy/cmpm17_venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/liamtsy/cmpm17_venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/liamtsy/Desktop/Exchange_student/UCSC/Winter_2025/CMPM17-02/cmpm-17-final-project/main.py", line 121, in forward
+    x = self.fc1(x)
+  File "/Users/liamtsy/cmpm17_venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/liamtsy/cmpm17_venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/liamtsy/cmpm17_venv/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x8192 and 4096x128)

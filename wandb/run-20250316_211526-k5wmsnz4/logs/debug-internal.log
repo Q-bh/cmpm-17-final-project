@@ -1,0 +1,16 @@
+{"time":"2025-03-16T21:15:26.838337-07:00","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/Users/liamtsy/Desktop/Exchange_student/UCSC/Winter_2025/CMPM17-02/cmpm-17-final-project/wandb/run-20250316_211526-k5wmsnz4/logs/debug-core.log"}
+{"time":"2025-03-16T21:15:26.966928-07:00","level":"INFO","msg":"created new stream","id":"k5wmsnz4"}
+{"time":"2025-03-16T21:15:26.967129-07:00","level":"INFO","msg":"stream: started","id":"k5wmsnz4"}
+{"time":"2025-03-16T21:15:26.967273-07:00","level":"INFO","msg":"handler: started","stream_id":"k5wmsnz4"}
+{"time":"2025-03-16T21:15:26.967329-07:00","level":"INFO","msg":"writer: Do: started","stream_id":"k5wmsnz4"}
+{"time":"2025-03-16T21:15:26.96735-07:00","level":"INFO","msg":"sender: started","stream_id":"k5wmsnz4"}
+{"time":"2025-03-16T21:15:27.324349-07:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-03-16T21:36:43.364871-07:00","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/files/liamyoum-university-of-california/CMPM17_FINAL/k5wmsnz4/file_stream\": read tcp 100.64.174.133:49980->35.186.228.49:443: read: connection reset by peer"}
+{"time":"2025-03-16T22:48:07.354135-07:00","level":"INFO","msg":"stream: closing","id":"k5wmsnz4"}
+{"time":"2025-03-16T22:48:07.354386-07:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-03-16T22:48:07.35771-07:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-03-16T22:48:08.541037-07:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-03-16T22:48:08.701823-07:00","level":"INFO","msg":"writer: Close: closed","stream_id":"k5wmsnz4"}
+{"time":"2025-03-16T22:48:08.70209-07:00","level":"INFO","msg":"handler: closed","stream_id":"k5wmsnz4"}
+{"time":"2025-03-16T22:48:08.702173-07:00","level":"INFO","msg":"sender: closed","stream_id":"k5wmsnz4"}
+{"time":"2025-03-16T22:48:08.702227-07:00","level":"INFO","msg":"stream: closed","id":"k5wmsnz4"}
